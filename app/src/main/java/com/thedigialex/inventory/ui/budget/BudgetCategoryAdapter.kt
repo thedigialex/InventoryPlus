@@ -5,13 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.thedigialex.inventory.database.entity.BudgetCategory
 import com.thedigialex.inventory.databinding.ItemBudgetCategoryBinding
 
 class BudgetCategoryAdapter(
-    private val onClick: (BudgetCategory) -> Unit,
-    private val onDelete: (BudgetCategory) -> Unit
-) : ListAdapter<BudgetCategory, BudgetCategoryAdapter.ViewHolder>(DIFF) {
+    private val onClick: (CategoryWithTotal) -> Unit,
+    private val onDelete: (CategoryWithTotal) -> Unit
+) : ListAdapter<CategoryWithTotal, BudgetCategoryAdapter.ViewHolder>(DIFF) {
 
     var selectedId: Int = -1
 
@@ -21,7 +20,8 @@ class BudgetCategoryAdapter(
         ViewHolder(ItemBudgetCategoryBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val cat = getItem(position)
+        val item = getItem(position)
+        val cat = item.category
         holder.binding.apply {
             tvName.text = cat.name
             tvType.text = cat.type.replaceFirstChar { it.uppercase() }
@@ -29,17 +29,18 @@ class BudgetCategoryAdapter(
                 if (cat.type == "income") root.context.getColor(android.R.color.holo_green_dark)
                 else root.context.getColor(android.R.color.holo_red_dark)
             )
+            tvTotal.text = "Budgeted: ${"%.2f".format(item.total)}"
             root.isSelected = cat.id == selectedId
             root.strokeWidth = if (cat.id == selectedId) 3 else 0
-            root.setOnClickListener { onClick(cat) }
-            btnDelete.setOnClickListener { onDelete(cat) }
+            root.setOnClickListener { onClick(item) }
+            btnDelete.setOnClickListener { onDelete(item) }
         }
     }
 
     companion object {
-        val DIFF = object : DiffUtil.ItemCallback<BudgetCategory>() {
-            override fun areItemsTheSame(a: BudgetCategory, b: BudgetCategory) = a.id == b.id
-            override fun areContentsTheSame(a: BudgetCategory, b: BudgetCategory) = a == b
+        val DIFF = object : DiffUtil.ItemCallback<CategoryWithTotal>() {
+            override fun areItemsTheSame(a: CategoryWithTotal, b: CategoryWithTotal) = a.category.id == b.category.id
+            override fun areContentsTheSame(a: CategoryWithTotal, b: CategoryWithTotal) = a == b
         }
     }
 }

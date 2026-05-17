@@ -15,6 +15,7 @@ class BudgetRepository(
     fun getEntriesForMonth(start: Long, end: Long) = budgetDao.getEntriesForMonth(start, end)
     fun getAllCategories() = categoryDao.getAllCategories()
     fun getSubCategoriesFor(categoryId: Int) = subCategoryDao.getSubCategoriesForCategory(categoryId)
+    fun getAllCategoryTotals() = subCategoryDao.getAllCategoryTotals()
 
     suspend fun getAllCategoriesOnce() = categoryDao.getAllCategoriesOnce()
     suspend fun getSubCategoriesOnce(categoryId: Int) = subCategoryDao.getSubCategoriesOnce(categoryId)

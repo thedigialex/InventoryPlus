@@ -28,27 +28,38 @@ class ManageCategoriesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         catAdapter = BudgetCategoryAdapter(
-            onClick = { cat ->
-                selectedCategory = cat
-                catAdapter.selectedId = cat.id
+            onClick = { item ->
+                selectedCategory = item.category
+                catAdapter.selectedId = item.category.id
                 catAdapter.notifyDataSetChanged()
-                binding.tvSubCatHeader.text = "${cat.name} — Sub-categories"
-                viewModel.getSubCategoriesFor(cat.id).observe(viewLifecycleOwner) {
-                    subCatAdapter.submitList(it)
-                }
+                binding.tvSubCatHeader.text = "${item.category.name} — Sub-categories"
+                binding.layoutSubCatSection.visibility = View.VISIBLE
+                viewModel.selectCategory(item.category.id)
             },
-            onDelete = { viewModel.deleteCategory(it) }
+            onDelete = { viewModel.deleteCategory(it.category) }
         )
         binding.rvCategories.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCategories.adapter = catAdapter
 
-        subCatAdapter = BudgetSubCategoryAdapter { viewModel.deleteSubCategory(it) }
+        subCatAdapter = BudgetSubCategoryAdapter(
+            onEdit = { showEditSubCategoryDialog(it) },
+            onDelete = { viewModel.deleteSubCategory(it) }
+        )
         binding.rvSubCategories.layoutManager = LinearLayoutManager(requireContext())
         binding.rvSubCategories.adapter = subCatAdapter
 
-        viewModel.categories.observe(viewLifecycleOwner) { catAdapter.submitList(it) }
+        viewModel.subCategoriesForSelected.observe(viewLifecycleOwner) { subs ->
+            subCatAdapter.submitList(subs)
+        }
+
+        viewModel.categoriesWithTotals.observe(viewLifecycleOwner) { catAdapter.submitList(it) }
+
+        viewModel.sortByTotal.observe(viewLifecycleOwner) { byTotal ->
+            binding.btnSort.text = if (byTotal) "Total ↕" else "Name ↕"
+        }
 
         binding.btnBack.setOnClickListener { findNavController().popBackStack() }
+        binding.btnSort.setOnClickListener { viewModel.toggleSort() }
         binding.btnAddCategory.setOnClickListener { showAddCategoryDialog() }
         binding.btnAddSubCategory.setOnClickListener {
             val cat = selectedCategory
@@ -84,6 +95,24 @@ class ManageCategoriesFragment : Fragment() {
                 val name = etName.text.toString().ifBlank { return@setPositiveButton }
                 val amount = etAmount.text.toString().toDoubleOrNull() ?: 0.0
                 viewModel.insertSubCategory(BudgetSubCategory(categoryId = category.id, name = name, budgetedAmount = amount))
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showEditSubCategoryDialog(sub: BudgetSubCategory) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_sub_category, null)
+        val etName = dialogView.findViewById<EditText>(R.id.etName)
+        val etAmount = dialogView.findViewById<EditText>(R.id.etAmount)
+        etName.setText(sub.name)
+        etAmount.setText(sub.budgetedAmount.toString())
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Edit \"${sub.name}\"")
+            .setView(dialogView)
+            .setPositiveButton("Save") { _, _ ->
+                val name = etName.text.toString().ifBlank { return@setPositiveButton }
+                val amount = etAmount.text.toString().toDoubleOrNull() ?: 0.0
+                viewModel.updateSubCategory(sub.copy(name = name, budgetedAmount = amount))
             }
             .setNegativeButton("Cancel", null)
             .show()

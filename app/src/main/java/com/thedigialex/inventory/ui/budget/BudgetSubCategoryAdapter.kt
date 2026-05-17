@@ -9,6 +9,7 @@ import com.thedigialex.inventory.database.entity.BudgetSubCategory
 import com.thedigialex.inventory.databinding.ItemBudgetSubCategoryBinding
 
 class BudgetSubCategoryAdapter(
+    private val onEdit: (BudgetSubCategory) -> Unit,
     private val onDelete: (BudgetSubCategory) -> Unit
 ) : ListAdapter<BudgetSubCategory, BudgetSubCategoryAdapter.ViewHolder>(DIFF) {
 
@@ -22,6 +23,7 @@ class BudgetSubCategoryAdapter(
         holder.binding.apply {
             tvName.text = sub.name
             tvBudgeted.text = "Budget: ${"%.2f".format(sub.budgetedAmount)}"
+            btnEdit.setOnClickListener { onEdit(sub) }
             btnDelete.setOnClickListener { onDelete(sub) }
         }
     }

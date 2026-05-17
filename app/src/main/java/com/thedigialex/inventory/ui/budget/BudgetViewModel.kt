@@ -18,6 +18,8 @@ sealed class BudgetListItem {
     data class Entry(val entry: BudgetEntry) : BudgetListItem()
 }
 
+data class CategoryWithTotal(val category: BudgetCategory, val total: Double)
+
 class BudgetViewModel(app: Application) : AndroidViewModel(app) {
     private val db = AppDatabase.getInstance(app)
     private val repo = BudgetRepository(db.budgetDao(), db.budgetCategoryDao(), db.budgetSubCategoryDao())
@@ -38,6 +40,36 @@ class BudgetViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     val categories: LiveData<List<BudgetCategory>> = repo.getAllCategories()
+
+    private val _rawCategoryTotals = repo.getAllCategoryTotals()
+    private val _sortByTotal = MutableLiveData(false)
+    val sortByTotal: LiveData<Boolean> = _sortByTotal
+
+    val categoriesWithTotals: LiveData<List<CategoryWithTotal>> = MediatorLiveData<List<CategoryWithTotal>>().also { med ->
+        fun recompute() {
+            val cats = categories.value ?: return
+            val totalsMap = _rawCategoryTotals.value?.associate { it.categoryId to it.total } ?: emptyMap()
+            val byTotal = _sortByTotal.value ?: false
+            val list = cats.map { CategoryWithTotal(it, totalsMap[it.id] ?: 0.0) }
+            med.value = if (byTotal) {
+                list.sortedWith(compareBy<CategoryWithTotal> { if (it.category.type == "income") 0 else 1 }.thenByDescending { it.total })
+            } else {
+                list.sortedWith(compareBy<CategoryWithTotal> { if (it.category.type == "income") 0 else 1 }.thenBy { it.category.name })
+            }
+        }
+        med.addSource(categories) { recompute() }
+        med.addSource(_rawCategoryTotals) { recompute() }
+        med.addSource(_sortByTotal) { recompute() }
+    }
+
+    fun toggleSort() { _sortByTotal.value = !(_sortByTotal.value ?: false) }
+
+    private val _selectedCategoryId = MutableLiveData<Int>()
+    val subCategoriesForSelected: LiveData<List<BudgetSubCategory>> = _selectedCategoryId.switchMap { id ->
+        repo.getSubCategoriesFor(id)
+    }
+
+    fun selectCategory(categoryId: Int) { _selectedCategoryId.value = categoryId }
 
     fun getSubCategoriesFor(categoryId: Int) = repo.getSubCategoriesFor(categoryId)
 
@@ -65,6 +97,7 @@ class BudgetViewModel(app: Application) : AndroidViewModel(app) {
     fun insertCategory(c: BudgetCategory) = viewModelScope.launch { repo.insertCategory(c) }
     fun deleteCategory(c: BudgetCategory) = viewModelScope.launch { repo.deleteCategory(c) }
     fun insertSubCategory(s: BudgetSubCategory) = viewModelScope.launch { repo.insertSubCategory(s) }
+    fun updateSubCategory(s: BudgetSubCategory) = viewModelScope.launch { repo.updateSubCategory(s) }
     fun deleteSubCategory(s: BudgetSubCategory) = viewModelScope.launch { repo.deleteSubCategory(s) }
 
     private fun monthStart(cal: Calendar) = (cal.clone() as Calendar).apply {

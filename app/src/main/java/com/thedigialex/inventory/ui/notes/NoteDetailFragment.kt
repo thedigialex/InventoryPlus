@@ -37,6 +37,8 @@ class NoteDetailFragment : Fragment() {
             }
         }
 
+        binding.btnBack.setOnClickListener { findNavController().popBackStack() }
+
         binding.btnSave.setOnClickListener {
             val title = binding.etTitle.text.toString().ifBlank { "Untitled" }
             val description = binding.etDescription.text.toString()

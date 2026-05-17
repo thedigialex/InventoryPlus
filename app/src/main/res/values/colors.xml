@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bgPrimary">#262626</color>
+    <color name="bgSecondary">#333333</color>
+    <color name="bgTertiary">#292929</color>
+    <color name="accent">#e47e00</color>
+    <color name="bgNeutral">#444444</color>
+    <color name="neutralAccent">#715c43</color>
+    <color name="accentNeutral">#9c692a</color>
+    <color name="accentLight">#eba753</color>
+    <color name="neutral">#545454</color>
+    <color name="errorRed">#dc2626</color>
+    <color name="infoYellow">#F8EDAD</color>
+    <color name="successGreen">#ADF8C7</color>
+    <color name="textPrimary">#FAFAFA</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

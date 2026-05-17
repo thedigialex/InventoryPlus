@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Inventory+</string>
+    <string name="budget">Budget</string>
+    <string name="tasks">Tasks</string>
+    <string name="notes">Notes</string>
+    <string name="calendar">Calendar</string>
+</resources>

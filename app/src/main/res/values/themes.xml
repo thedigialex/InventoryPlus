@@ -1,0 +1,22 @@
+<resources>
+    <style name="Theme.Inventory" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorPrimaryVariant">@color/accentNeutral</item>
+        <item name="colorOnPrimary">@color/textPrimary</item>
+        <item name="colorSecondary">@color/accentLight</item>
+        <item name="colorSecondaryVariant">@color/neutralAccent</item>
+        <item name="colorOnSecondary">@color/bgPrimary</item>
+        <item name="colorSurface">@color/bgSecondary</item>
+        <item name="colorOnSurface">@color/textPrimary</item>
+        <item name="android:colorBackground">@color/bgPrimary</item>
+        <item name="colorOnBackground">@color/textPrimary</item>
+        <item name="colorError">@color/errorRed</item>
+        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:textColorSecondary">@color/textPrimary</item>
+        <item name="colorControlNormal">@color/textPrimary</item>
+        <item name="colorControlActivated">@color/accent</item>
+        <item name="android:statusBarColor">@color/bgPrimary</item>
+        <item name="android:navigationBarColor">@color/bgTertiary</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
+</resources>

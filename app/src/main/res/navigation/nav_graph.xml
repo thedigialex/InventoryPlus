@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/budgetFragment">
+
+    <fragment
+        android:id="@+id/budgetFragment"
+        android:name="com.thedigialex.inventory.ui.budget.BudgetFragment"
+        android:label="Budget">
+        <action
+            android:id="@+id/action_budget_to_manage_categories"
+            app:destination="@id/manageCategoriesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/manageCategoriesFragment"
+        android:name="com.thedigialex.inventory.ui.budget.ManageCategoriesFragment"
+        android:label="Manage Categories" />
+
+    <fragment
+        android:id="@+id/projectsFragment"
+        android:name="com.thedigialex.inventory.ui.tasks.ProjectsFragment"
+        android:label="Projects">
+        <action
+            android:id="@+id/action_projects_to_features"
+            app:destination="@id/featuresFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/featuresFragment"
+        android:name="com.thedigialex.inventory.ui.tasks.FeaturesFragment"
+        android:label="Features">
+        <action
+            android:id="@+id/action_features_to_tasks"
+            app:destination="@id/tasksFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/tasksFragment"
+        android:name="com.thedigialex.inventory.ui.tasks.TasksFragment"
+        android:label="Tasks" />
+
+    <fragment
+        android:id="@+id/notesFragment"
+        android:name="com.thedigialex.inventory.ui.notes.NotesFragment"
+        android:label="Notes">
+        <action
+            android:id="@+id/action_notes_to_detail"
+            app:destination="@id/noteDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/noteDetailFragment"
+        android:name="com.thedigialex.inventory.ui.notes.NoteDetailFragment"
+        android:label="Note">
+        <argument
+            android:name="noteId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.thedigialex.inventory.ui.calendar.CalendarFragment"
+        android:label="Calendar" />
+</navigation>

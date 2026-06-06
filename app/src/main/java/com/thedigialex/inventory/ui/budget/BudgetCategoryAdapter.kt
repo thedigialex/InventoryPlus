@@ -9,6 +9,7 @@ import com.thedigialex.inventory.databinding.ItemBudgetCategoryBinding
 
 class BudgetCategoryAdapter(
     private val onClick: (CategoryWithTotal) -> Unit,
+    private val onEdit: (CategoryWithTotal) -> Unit,
     private val onDelete: (CategoryWithTotal) -> Unit
 ) : ListAdapter<CategoryWithTotal, BudgetCategoryAdapter.ViewHolder>(DIFF) {
 
@@ -33,6 +34,7 @@ class BudgetCategoryAdapter(
             root.isSelected = cat.id == selectedId
             root.strokeWidth = if (cat.id == selectedId) 3 else 0
             root.setOnClickListener { onClick(item) }
+            btnEdit.setOnClickListener { onEdit(item) }
             btnDelete.setOnClickListener { onDelete(item) }
         }
     }

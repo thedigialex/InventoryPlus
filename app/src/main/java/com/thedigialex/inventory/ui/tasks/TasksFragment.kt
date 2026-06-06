@@ -14,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.tabs.TabLayout
 import com.thedigialex.inventory.R
 import com.thedigialex.inventory.database.entity.Task
 import com.thedigialex.inventory.databinding.FragmentTasksBinding
@@ -25,6 +26,8 @@ class TasksFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: TaskViewModel by activityViewModels()
     private lateinit var adapter: TaskAdapter
+    private var allTasks: List<Task> = emptyList()
+    private var showCompleted = false
 
     private val dateFmt = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
 
@@ -42,10 +45,28 @@ class TasksFragment : Fragment() {
         binding.rvTasks.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTasks.adapter = adapter
 
-        viewModel.tasks.observe(viewLifecycleOwner) { adapter.submitList(it) }
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Active"))
+        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Completed"))
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                showCompleted = tab.position == 1
+                applyFilter()
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+
+        viewModel.tasks.observe(viewLifecycleOwner) {
+            allTasks = it
+            applyFilter()
+        }
         viewModel.selectedFeature.observe(viewLifecycleOwner) { binding.tvFeatureTitle.text = it.name }
         binding.btnBack.setOnClickListener { findNavController().popBackStack() }
         binding.fab.setOnClickListener { showTaskDialog(null) }
+    }
+
+    private fun applyFilter() {
+        adapter.submitList(allTasks.filter { it.isCompleted == showCompleted })
     }
 
     private fun showTaskDialog(existing: Task?) {

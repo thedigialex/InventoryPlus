@@ -13,6 +13,7 @@ class BudgetRepository(
     private val subCategoryDao: BudgetSubCategoryDao
 ) {
     fun getEntriesForMonth(start: Long, end: Long) = budgetDao.getEntriesForMonth(start, end)
+    fun getCarryoverBalance(start: Long) = budgetDao.getCarryoverBalance(start)
     fun getAllCategories() = categoryDao.getAllCategories()
     fun getSubCategoriesFor(categoryId: Int) = subCategoryDao.getSubCategoriesForCategory(categoryId)
     fun getAllCategoryTotals() = subCategoryDao.getAllCategoryTotals()
@@ -24,6 +25,7 @@ class BudgetRepository(
     suspend fun delete(entry: BudgetEntry) = budgetDao.delete(entry)
 
     suspend fun insertCategory(c: BudgetCategory): Long = categoryDao.insert(c)
+    suspend fun updateCategory(c: BudgetCategory) = categoryDao.update(c)
     suspend fun deleteCategory(c: BudgetCategory) = categoryDao.delete(c)
     suspend fun insertSubCategory(s: BudgetSubCategory) = subCategoryDao.insert(s)
     suspend fun updateSubCategory(s: BudgetSubCategory) = subCategoryDao.update(s)

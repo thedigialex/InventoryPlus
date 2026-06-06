@@ -15,6 +15,9 @@ interface BudgetCategoryDao {
     @Insert
     suspend fun insert(category: BudgetCategory): Long
 
+    @Update
+    suspend fun update(category: BudgetCategory)
+
     @Delete
     suspend fun delete(category: BudgetCategory)
 }

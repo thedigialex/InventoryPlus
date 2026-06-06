@@ -31,6 +31,10 @@ class BudgetViewModel(app: Application) : AndroidViewModel(app) {
         repo.getEntriesForMonth(monthStart(cal), monthEnd(cal))
     }
 
+    val carryoverBalance: LiveData<Double> = _currentMonth.switchMap { cal ->
+        repo.getCarryoverBalance(monthStart(cal))
+    }
+
     val groupedEntries: LiveData<List<BudgetListItem>> = entries.map { list ->
         list.groupBy { it.categoryName }
             .flatMap { (name, items) ->
@@ -95,6 +99,7 @@ class BudgetViewModel(app: Application) : AndroidViewModel(app) {
     fun delete(entry: BudgetEntry) = viewModelScope.launch { repo.delete(entry) }
 
     fun insertCategory(c: BudgetCategory) = viewModelScope.launch { repo.insertCategory(c) }
+    fun updateCategory(c: BudgetCategory) = viewModelScope.launch { repo.updateCategory(c) }
     fun deleteCategory(c: BudgetCategory) = viewModelScope.launch { repo.deleteCategory(c) }
     fun insertSubCategory(s: BudgetSubCategory) = viewModelScope.launch { repo.insertSubCategory(s) }
     fun updateSubCategory(s: BudgetSubCategory) = viewModelScope.launch { repo.updateSubCategory(s) }

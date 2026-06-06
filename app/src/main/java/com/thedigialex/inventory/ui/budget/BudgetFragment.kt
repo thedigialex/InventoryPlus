@@ -44,13 +44,32 @@ class BudgetFragment : Fragment() {
             binding.fab.visibility = if (isCurrentMonth) View.VISIBLE else View.GONE
         }
 
-        viewModel.entries.observe(viewLifecycleOwner) { entries ->
-            val (incomeList, expenseList) = entries.partition { it.type == "income" }
+        var currentCarryover = 0.0
+
+        fun updateSummary(entries: List<BudgetEntry>?, carryover: Double) {
+            val list = entries ?: return
+            val (incomeList, expenseList) = list.partition { it.type == "income" }
             val income = incomeList.sumOf { it.amount }
             val expenses = expenseList.sumOf { it.amount }
             binding.tvIncome.text = "Income: +${"%.2f".format(income)}"
             binding.tvExpenses.text = "Expenses: -${"%.2f".format(expenses)}"
-            binding.tvBalance.text = "Balance: ${"%.2f".format(income - expenses)}"
+            binding.tvBalance.text = "Balance: ${"%.2f".format(carryover + income - expenses)}"
+            if (carryover != 0.0) {
+                val sign = if (carryover >= 0) "+" else ""
+                binding.tvCarryover.text = "Carried Over: $sign${"%.2f".format(carryover)}"
+                binding.tvCarryover.visibility = android.view.View.VISIBLE
+            } else {
+                binding.tvCarryover.visibility = android.view.View.GONE
+            }
+        }
+
+        viewModel.entries.observe(viewLifecycleOwner) { entries ->
+            updateSummary(entries, currentCarryover)
+        }
+
+        viewModel.carryoverBalance.observe(viewLifecycleOwner) { carryover ->
+            currentCarryover = carryover ?: 0.0
+            updateSummary(viewModel.entries.value, currentCarryover)
         }
 
         viewModel.groupedEntries.observe(viewLifecycleOwner) { adapter.submitList(it) }

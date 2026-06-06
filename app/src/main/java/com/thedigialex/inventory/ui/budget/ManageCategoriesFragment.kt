@@ -36,7 +36,15 @@ class ManageCategoriesFragment : Fragment() {
                 binding.layoutSubCatSection.visibility = View.VISIBLE
                 viewModel.selectCategory(item.category.id)
             },
-            onDelete = { viewModel.deleteCategory(it.category) }
+            onEdit = { showEditCategoryDialog(it) },
+            onDelete = { item ->
+                if (item.category.id == selectedCategory?.id) {
+                    selectedCategory = null
+                    catAdapter.selectedId = -1
+                    binding.layoutSubCatSection.visibility = View.GONE
+                }
+                viewModel.deleteCategory(item.category)
+            }
         )
         binding.rvCategories.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCategories.adapter = catAdapter
@@ -79,6 +87,30 @@ class ManageCategoriesFragment : Fragment() {
                 val name = etName.text.toString().ifBlank { return@setPositiveButton }
                 val type = if (rgType.checkedRadioButtonId == R.id.rbIncome) "income" else "expense"
                 viewModel.insertCategory(BudgetCategory(name = name, type = type))
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showEditCategoryDialog(item: CategoryWithTotal) {
+        val cat = item.category
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_category, null)
+        val etName = dialogView.findViewById<EditText>(R.id.etName)
+        val rgType = dialogView.findViewById<RadioGroup>(R.id.rgType)
+        etName.setText(cat.name)
+        rgType.check(if (cat.type == "income") R.id.rbIncome else R.id.rbExpense)
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Edit \"${cat.name}\"")
+            .setView(dialogView)
+            .setPositiveButton("Save") { _, _ ->
+                val name = etName.text.toString().ifBlank { return@setPositiveButton }
+                val type = if (rgType.checkedRadioButtonId == R.id.rbIncome) "income" else "expense"
+                val updated = cat.copy(name = name, type = type)
+                viewModel.updateCategory(updated)
+                if (cat.id == selectedCategory?.id) {
+                    selectedCategory = updated
+                    binding.tvSubCatHeader.text = "${updated.name} — Sub-categories"
+                }
             }
             .setNegativeButton("Cancel", null)
             .show()
